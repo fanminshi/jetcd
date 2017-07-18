@@ -1,36 +1,30 @@
 package com.coreos.jetcd.kv;
 
-import com.coreos.jetcd.data.Header;
+import com.coreos.jetcd.api.DeleteRangeResponse;
+import com.coreos.jetcd.data.AbstractResponse;
 import com.coreos.jetcd.data.KeyValue;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class DeleteResponse {
+public class DeleteResponse extends AbstractResponse<DeleteRangeResponse> {
 
-  private Header header;
-  private long deleted;
-  private List<KeyValue> prevKvs;
-
-  public DeleteResponse(Header header, long deleted, List<KeyValue> prevKvs) {
-    this.header = header;
-    this.deleted = deleted;
-    this.prevKvs = prevKvs;
-  }
-
-  public Header getHeader() {
-    return header;
+  public DeleteResponse(DeleteRangeResponse deleteRangeResponse) {
+    super(deleteRangeResponse, deleteRangeResponse.getHeader());
   }
 
   /**
    * return the number of keys deleted by the delete range request.
    */
   public long getDeleted() {
-    return deleted;
+    return getResponse().getDeleted();
   }
 
   /**
    * return previous key-value pairs.
    */
   public List<KeyValue> getPrevKvs() {
-    return prevKvs;
+    return getResponse().getPrevKvsList().stream()
+        .map(KeyValue::new)
+        .collect(Collectors.toList());
   }
 }
